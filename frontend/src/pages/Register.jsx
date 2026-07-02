@@ -93,7 +93,7 @@ export default function Register() {
                 onChange={handleChange}
                 required
                 className={inputClass}
-                placeholder="Mohamed"
+                placeholder="Frist Name"
               />
             </div>
             <div>
@@ -107,7 +107,7 @@ export default function Register() {
                 onChange={handleChange}
                 required
                 className={inputClass}
-                placeholder="Mussa"
+                placeholder="Last Name"
               />
             </div>
           </div>
