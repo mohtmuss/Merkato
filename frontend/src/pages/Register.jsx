@@ -3,7 +3,15 @@ import { useNavigate, Link } from 'react-router-dom'
 
 export default function Register() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({ full_name: '', email: '', password: '' })
+  const [form, setForm] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    confirm_password: '',
+    zip_code: '',
+    phone: '',
+  })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -14,13 +22,24 @@ export default function Register() {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    setLoading(true)
 
+    // Client-side checks before hitting the API
+    if (form.password !== form.confirm_password) {
+      setError('Passwords do not match')
+      return
+    }
+    if (!/^\d{5}$/.test(form.zip_code)) {
+      setError('Zip code must be 5 digits')
+      return
+    }
+
+    setLoading(true)
     try {
+      const { confirm_password, ...payload } = form
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       })
 
       const data = await res.json()
@@ -41,6 +60,9 @@ export default function Register() {
     }
   }
 
+  const inputClass =
+    'w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400'
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 w-full max-w-md p-8">
@@ -57,19 +79,37 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full name
-            </label>
-            <input
-              type="text"
-              name="full_name"
-              value={form.full_name}
-              onChange={handleChange}
-              required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
-              placeholder="Mohamed Mussa"
-            />
+
+          {/* Names side by side */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                First name
+              </label>
+              <input
+                type="text"
+                name="first_name"
+                value={form.first_name}
+                onChange={handleChange}
+                required
+                className={inputClass}
+                placeholder="Mohamed"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Last name
+              </label>
+              <input
+                type="text"
+                name="last_name"
+                value={form.last_name}
+                onChange={handleChange}
+                required
+                className={inputClass}
+                placeholder="Mussa"
+              />
+            </div>
           </div>
 
           <div>
@@ -82,7 +122,7 @@ export default function Register() {
               value={form.email}
               onChange={handleChange}
               required
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className={inputClass}
               placeholder="you@example.com"
             />
           </div>
@@ -98,9 +138,57 @@ export default function Register() {
               onChange={handleChange}
               required
               minLength={8}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className={inputClass}
               placeholder="At least 8 characters"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Confirm password
+            </label>
+            <input
+              type="password"
+              name="confirm_password"
+              value={form.confirm_password}
+              onChange={handleChange}
+              required
+              className={inputClass}
+              placeholder="Repeat your password"
+            />
+          </div>
+
+          {/* Zip + phone side by side */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Zip code
+              </label>
+              <input
+                type="text"
+                name="zip_code"
+                value={form.zip_code}
+                onChange={handleChange}
+                required
+                inputMode="numeric"
+                maxLength={5}
+                className={inputClass}
+                placeholder="17603"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone <span className="text-gray-400">(optional)</span>
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="(717) 555-1234"
+              />
+            </div>
           </div>
 
           <button
