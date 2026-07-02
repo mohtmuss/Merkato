@@ -47,7 +47,7 @@ export default function Login() {
 
         <div className="mb-8 text-center">
           <Link to="/">
-            <img src="/logo.png" alt="Merkato" className="h-20 mx-auto" />
+            <img src="/logo.png" alt="Merkato" className="h-28 mx-auto" />
           </Link>
           <p className="text-gray-500 mt-1">Sign in to your account</p>
         </div>
