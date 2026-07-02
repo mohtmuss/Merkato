@@ -16,19 +16,22 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
 
-      {/* Hero with rotating background */}
+      {/* Hero */}
       <div className="relative flex-1 min-h-screen overflow-hidden">
 
-        {/* Rotating background images */}
+        {/* Rotating background images — desktop/tablet only */}
         {HERO_IMAGES.map((img, i) => (
           <div
             key={img}
-            className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
+            className={`hidden md:block absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
               i === current ? 'opacity-100' : 'opacity-0'
             }`}
             style={{ backgroundImage: `url('${img}')` }}
           />
         ))}
+
+        {/* Mobile-only gradient background */}
+        <div className="md:hidden absolute inset-0 bg-gradient-to-br from-orange-600 via-orange-500 to-amber-700" />
 
         {/* Dark overlay so text is readable */}
         <div className="absolute inset-0 bg-black/40" />
@@ -56,13 +59,13 @@ export default function Home() {
         <div className="relative z-10 max-w-3xl mx-auto text-center px-6 pt-24 md:pt-36 pb-32">
           <h2 className="text-4xl md:text-6xl font-extrabold text-white leading-tight drop-shadow-lg">
             Buy and sell anything,
-            <span className="text-orange-400"> right in your community</span>
+            <span className="text-orange-300"> right in your community</span>
           </h2>
           <p className="text-white/90 text-lg mt-6 max-w-xl mx-auto drop-shadow">
             Merkato is your local marketplace. List an item in seconds, find
             deals near you, and connect directly with buyers and sellers.
           </p>
-          <div className="mt-10 flex items-center justify-center gap-4">
+          <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
             <Link
               to="/register"
               className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-3.5 rounded-xl text-lg transition"
