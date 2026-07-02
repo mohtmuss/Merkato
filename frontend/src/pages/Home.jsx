@@ -19,19 +19,19 @@ export default function Home() {
       {/* Hero */}
       <div className="relative flex-1 min-h-screen overflow-hidden">
 
-        {/* Rotating background images — desktop/tablet only */}
+        {/* Backdrop gradient (visible around the image on mobile) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-orange-700 via-orange-500 to-amber-700" />
+
+        {/* Rotating background images — full image on mobile, full-bleed on desktop */}
         {HERO_IMAGES.map((img, i) => (
           <div
             key={img}
-            className={`hidden md:block absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${
+            className={`absolute inset-0 bg-contain md:bg-cover bg-no-repeat bg-center transition-opacity duration-1000 ${
               i === current ? 'opacity-100' : 'opacity-0'
             }`}
             style={{ backgroundImage: `url('${img}')` }}
           />
         ))}
-
-        {/* Mobile-only gradient background */}
-        <div className="md:hidden absolute inset-0 bg-gradient-to-br from-orange-600 via-orange-500 to-amber-700" />
 
         {/* Dark overlay so text is readable */}
         <div className="absolute inset-0 bg-black/40" />
@@ -82,7 +82,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* About section */}
+     {/* About section */}
       <section className="bg-white py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <h3 className="text-3xl font-bold text-gray-900 text-center mb-12">
