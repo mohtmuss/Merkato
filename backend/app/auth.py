@@ -1,4 +1,5 @@
 from functools import wraps
+import re
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (
     create_access_token,
@@ -9,6 +10,9 @@ from flask_jwt_extended import (
 from .extensions import db
 from .models import User
 
+
+
+NAME_RE = re.compile(r"^[A-Za-z][A-Za-z\s'\-]*$")
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
 
@@ -24,8 +28,16 @@ def register():
 
     if not email or not password or not first_name or not last_name or not zip_code:
         return jsonify({"error": "email, password, first name, last name and zip code are required"}), 400
+    if not NAME_RE.match(first_name) or not NAME_RE.match(last_name):
+        return jsonify({"error": "names can only contain letters, spaces, hyphens and apostrophes"}), 400
     if len(password) < 8:
         return jsonify({"error": "password must be at least 8 characters"}), 400
+    if not re.search(r"[A-Z]", password):
+        return jsonify({"error": "password must include an uppercase letter"}), 400
+    if not re.search(r"\d", password):
+        return jsonify({"error": "password must include a number"}), 400
+    if not re.search(r"[^A-Za-z0-9]", password):
+        return jsonify({"error": "password must include a symbol"}), 400
     if not (zip_code.isdigit() and len(zip_code) == 5):
         return jsonify({"error": "zip code must be 5 digits"}), 400
     if phone:
@@ -74,7 +86,7 @@ def login():
 @auth_bp.get("/me")
 @jwt_required()
 def me():
-    user = User.query.get(get_jwt_identity())
+    user = db.session.get(User, get_jwt_identity())
     if not user:
         return jsonify({"error": "user not found"}), 404
     return jsonify({"user": user.to_dict()}), 200

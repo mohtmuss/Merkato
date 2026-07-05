@@ -1,5 +1,21 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import TermsModal from '../components/TermsModal'
+
+function passwordStrength(password) {
+  if (!password) return { score: 0, label: '', color: '', width: '0%' }
+
+  let score = 0
+  if (password.length >= 8) score++
+  if (/[A-Z]/.test(password)) score++
+  if (/[a-z]/.test(password)) score++
+  if (/\d/.test(password)) score++
+  if (/[^A-Za-z0-9]/.test(password)) score++
+
+  if (score <= 2) return { score, label: 'Weak', color: 'bg-red-500', text: 'text-red-500', width: '33%' }
+  if (score <= 4) return { score, label: 'Medium', color: 'bg-yellow-500', text: 'text-yellow-600', width: '66%' }
+  return { score, label: 'Strong', color: 'bg-green-500', text: 'text-green-600', width: '100%' }
+}
 
 export default function Register() {
   const navigate = useNavigate()
@@ -14,6 +30,10 @@ export default function Register() {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [agreed, setAgreed] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
+
+  const strength = passwordStrength(form.password)
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -141,6 +161,21 @@ export default function Register() {
               className={inputClass}
               placeholder="At least 8 characters"
             />
+
+            {/* Strength meter */}
+            {form.password && (
+              <div className="mt-2">
+                <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-300 ${strength.color}`}
+                    style={{ width: strength.width }}
+                  />
+                </div>
+                <p className={`text-xs mt-1 font-medium ${strength.text}`}>
+                  {strength.label}
+                </p>
+              </div>
+            )}
           </div>
 
           <div>
@@ -190,10 +225,29 @@ export default function Register() {
             </div>
           </div>
 
+          {/* Terms agreement */}
+          <div
+            onClick={() => !agreed && setShowTerms(true)}
+            className="flex items-start gap-2 cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              checked={agreed}
+              readOnly
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-400 pointer-events-none"
+            />
+            <span className="text-sm text-gray-600">
+              I agree to the{' '}
+              <span className="text-orange-500 hover:underline">
+                Terms of Service and Privacy Policy
+              </span>
+            </span>
+          </div>
+
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg py-2.5 text-sm transition disabled:opacity-50"
+            disabled={loading || !agreed}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg py-2.5 text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Creating account...' : 'Create account'}
           </button>
@@ -205,6 +259,16 @@ export default function Register() {
             Sign in
           </Link>
         </p>
+
+        {showTerms && (
+          <TermsModal
+            onAgree={() => {
+              setAgreed(true)
+              setShowTerms(false)
+            }}
+            onClose={() => setShowTerms(false)}
+          />
+        )}
 
       </div>
     </div>
