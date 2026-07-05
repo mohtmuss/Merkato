@@ -30,10 +30,12 @@ def registered_user(client):
     """A user that already exists, for login tests."""
     payload = {
         "email": "mo@merkato.com",
-        "password": "password123",
+        "password": "Password123@",
         "first_name": "Mohamed",
         "last_name": "Mussa",
         "zip_code": "17603",
     }
     client.post("/api/auth/register", json=payload)
     return payload
+
+
