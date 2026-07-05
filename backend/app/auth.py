@@ -11,6 +11,7 @@ from .models import User
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
+
 @auth_bp.post("/register")
 def register():
     data = request.get_json(silent=True) or {}
@@ -21,7 +22,6 @@ def register():
     zip_code = (data.get("zip_code") or "").strip()
     phone = (data.get("phone") or "").strip()
 
-    # Required fields
     if not email or not password or not first_name or not last_name or not zip_code:
         return jsonify({"error": "email, password, first name, last name and zip code are required"}), 400
     if len(password) < 8:
@@ -52,3 +52,29 @@ def register():
         additional_claims={"role": user.role}
     )
     return jsonify({"token": token, "user": user.to_dict()}), 201
+
+
+@auth_bp.post("/login")
+def login():
+    data = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
+
+    user = User.query.filter_by(email=email).first()
+    if not user or not user.check_password(password):
+        return jsonify({"error": "invalid email or password"}), 401
+
+    token = create_access_token(
+        identity=user.id,
+        additional_claims={"role": user.role}
+    )
+    return jsonify({"token": token, "user": user.to_dict()}), 200
+
+
+@auth_bp.get("/me")
+@jwt_required()
+def me():
+    user = User.query.get(get_jwt_identity())
+    if not user:
+        return jsonify({"error": "user not found"}), 404
+    return jsonify({"user": user.to_dict()}), 200
