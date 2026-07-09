@@ -6,3 +6,4 @@ flask-bcrypt==1.0.1
 python-dotenv==1.0.1
 psycopg2-binary==2.9.9
 gunicorn==22.0.0
+resend==2.4.0
