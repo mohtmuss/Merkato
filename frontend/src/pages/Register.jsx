@@ -68,9 +68,7 @@ export default function Register() {
         return
       }
 
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-      navigate('/dashboard')
+      navigate('/verify', { state: { email: form.email } })
 
     } catch (err) {
       setError('Cannot reach the server. Is the backend running?')

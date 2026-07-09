@@ -24,11 +24,18 @@ export default function Login() {
       })
 
       const data = await res.json()
+      
 
       if (!res.ok) {
+        if (res.status === 403) {
+          // Account exists but email not verified — send them to verify
+          navigate('/verify', { state: { email: form.email } })
+          return
+        }
         setError(data.error || 'Something went wrong')
         return
       }
+      
 
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))

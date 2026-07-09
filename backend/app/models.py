@@ -19,6 +19,7 @@ class User(db.Model):
     phone = db.Column(db.String(20), default="")
     phone_verified = db.Column(db.Boolean, default=False)
     role = db.Column(db.String(20), nullable=False, default="user")
+    email_verified = db.Column(db.Boolean, default=False)
     created_at = db.Column(
         db.DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc)
@@ -40,6 +41,20 @@ class User(db.Model):
             "zip_code": self.zip_code,
             "phone": self.phone,
             "phone_verified": self.phone_verified,
+            "email_verified": self.email_verified,
             "role": self.role,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
+        
+        
+class VerificationCode(db.Model):
+    __tablename__ = "verification_codes"
+
+    id = db.Column(db.String(36), primary_key=True, default=_uuid)
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    code_hash = db.Column(db.String(255), nullable=False)
+    expires_at = db.Column(db.DateTime(timezone=True), nullable=False)
+    attempts = db.Column(db.Integer, default=0)
+    used = db.Column(db.Boolean, default=False)
+
+    user = db.relationship("User", backref="verification_codes")
